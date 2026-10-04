@@ -190,6 +190,7 @@ function App() {
     }
   }
   async function exit() {
+    setBusy(true);
     try {
       if (!demo) await api.logout();
       setDemo(false);
@@ -197,9 +198,12 @@ function App() {
       setView("list");
       setError("");
       setNotice("");
+      setConfirmation(null);
+      setSelected(null);
+      setDraft(blankProject());
     } catch {
       setError("အကောင့်ထွက်မရပါ။ ထပ်ကြိုးစားပေးပါ။");
-    }
+    } finally { setBusy(false); }
   }
   if (!user && !demo)
     return (
@@ -301,7 +305,7 @@ function App() {
             <small>{demo ? "နမူနာအချက်အလက်များ" : user?.email}</small>
           </div>
         </div>
-        <button disabled={busy || view === "edit"} onClick={exit}>
+        <button disabled={busy} onClick={()=>view === "edit" ? setConfirmation("logout") : exit()}>
           <LogOut size={16} />
           {demo ? "နမူနာမှ ထွက်မည်" : "အကောင့်ထွက်မည်"}
         </button>
@@ -313,7 +317,7 @@ function App() {
             title={
               confirmation === "delete"
                 ? "ပရောဂျက်ကို ဖျက်မလား"
-                : "ပြင်ဆင်ချက်တွေ ပယ်ဖျက်မလား"
+                : confirmation === "logout" ? "အကောင့်မှ ထွက်မလား" : "ပြင်ဆင်ချက်တွေ ပယ်ဖျက်မလား"
             }
             onClose={() => setConfirmation(null)}
             busy={busy}
@@ -329,13 +333,13 @@ function App() {
                 <button
                   className={confirmation === "delete" ? "danger" : "primary"}
                   disabled={busy}
-                  onClick={confirmation === "delete" ? del : discard}
+                  onClick={confirmation === "delete" ? del : confirmation === "logout" ? exit : discard}
                 >
                   {busy
                     ? "လုပ်ဆောင်နေသည်…"
                     : confirmation === "delete"
                       ? "အပြီးဖျက်မည်"
-                      : "ပယ်ဖျက်မည်"}
+                      : confirmation === "logout" ? "မသိမ်းဘဲ ထွက်မည်" : "ပယ်ဖျက်မည်"}
                 </button>
               </>
             }

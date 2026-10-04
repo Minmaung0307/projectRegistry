@@ -94,3 +94,13 @@ test("install guidance and safe discard", async ({ page }) => {
     page.getByRole("heading", { name: "သင့်ပရောဂျက်များ." }),
   ).toBeVisible();
 });
+
+test('logout is available while editing and cancellation preserves changes', async ({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'နမူနာ စမ်းသုံးမည်'}).click();
+ await page.getByRole('button',{name:'ပရောဂျက်အသစ်',exact:true}).click();
+ const name=page.getByRole('textbox',{name:'ပရောဂျက်အမည် *',exact:true});await name.fill('မသိမ်းရသေး');
+ const logout=page.getByRole('button',{name:'နမူနာမှ ထွက်မည်'});await expect(logout).toBeEnabled();await logout.click();
+ await page.getByRole('dialog').getByRole('button',{name:'မလုပ်သေးပါ'}).click();await expect(name).toHaveValue('မသိမ်းရသေး');
+ await logout.click();await page.getByRole('dialog').getByRole('button',{name:'မသိမ်းဘဲ ထွက်မည်'}).click();await expect(page.getByRole('button',{name:'Google / Gmail ဖြင့် ဝင်မည်'})).toBeVisible();
+ await page.getByRole('button',{name:'နမူနာ စမ်းသုံးမည်'}).click();await expect(page.getByRole('dialog')).toHaveCount(0);await page.getByRole('button',{name:'နမူနာမှ ထွက်မည်'}).click();await expect(page.getByRole('button',{name:'Google / Gmail ဖြင့် ဝင်မည်'})).toBeVisible();
+});
