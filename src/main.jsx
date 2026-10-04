@@ -12,7 +12,6 @@ import {
   Trash2,
   ChevronRight,
   ShieldCheck,
-  Code2,
 } from "lucide-react";
 import {
   groups,
@@ -25,6 +24,7 @@ import {
 } from "./model";
 import * as api from "./firebase";
 import "./style.css";
+import {projectIdentities,ProjectSymbol} from "./ProjectIdentity";
 import Modal from "./Modal";
 import SetupGuide from "./SetupGuide";
 import PwaControls from "./PwaControls";
@@ -81,6 +81,7 @@ function App() {
       },
     );
   }, [user, demo]);
+  const identities = projectIdentities(projects);
   const current = projects.find((p) => p.id === selected);
   const visible = filterProjects(projects, search, status, env).sort((a, b) =>
     a.name.localeCompare(b.name),
@@ -473,18 +474,19 @@ function App() {
                 <p role="status">ပရောဂျက်များ ရယူနေသည်…</p>
               ) : visible.length ? (
                 <div className="cards">
-                  {visible.map((p, i) => (
+                  {visible.map((p) => (
                     <button
                       key={p.id}
-                      className="project-card"
+                      className={"project-card theme-"+identities[p.id].color}
                       onClick={() => {
                         setSelected(p.id);
                         setView("detail");
                       }}
                     >
+                      <ProjectSymbol identity={identities[p.id]} className="card-watermark"/>
                       <div className="card-top">
-                        <span className={"project-icon color-" + (i % 3)}>
-                          <Code2 />
+                        <span className="project-icon">
+                          <ProjectSymbol identity={identities[p.id]}/>
                         </span>
                         <span className={"badge " + p.status.replace(" ", "-")}>
                           {labelOf(p.status)}
